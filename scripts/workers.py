@@ -8,7 +8,7 @@ import signal
 import subprocess
 import sys
 import time
-import PyzmqWorker
+import scripts.PyzmqWorker
 import argparse
 
 def start_cluster_workers(work_distributer, cluster_cmd, maxLen, gpu, K, D, batch_size):

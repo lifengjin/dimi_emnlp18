@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 import zmq
-from PyzmqMessage import get_file_signature, resource_current, ModelWrapper, PyzmqJob, SentenceJob, CompileJob, CompletedJob, PyzmqParse, CompiledRow, SentenceRequest, RowRequest
+from .PyzmqMessage import get_file_signature, resource_current, ModelWrapper, PyzmqJob, SentenceJob, CompileJob, CompletedJob, PyzmqParse, CompiledRow, SentenceRequest, RowRequest
 import logging
 import os.path
 import pickle
-from cky_sampler_inner import CKY_sampler
+from .cky_sampler_inner import CKY_sampler
 import sys
 
 import tempfile
 
 import os
 import time
-from uhhmm_io import printException, ParsingError
+from .dimi_io import printException, ParsingError
 
-from WorkDistributerServer import get_local_ip
+from .WorkDistributerServer import get_local_ip
 from collections import Counter, defaultdict
 
 
