@@ -44,19 +44,29 @@ sample config file in the repo.
 
 ```
 [io]
-input_file = ./genmodel/ptb_20.dev.linetoks.ints # ints file
-output_dir = ./outputs/WSJ20 # folder where output goes
-dict_file = ./genmodel/ptb_20.dev.linetoks.dict # dict file
+input_file = ./genmodel/ptb_20.dev.linetoks.ints
+output_dir = ./outputs/WSJ20
+dict_file = ./genmodel/ptb_20.dev.linetoks.dict
 
 [params]
-iters = 700 # total iteration of MCMC
-K = 15 # number of non-terminal categories
-init_alpha = .2 # alpha for Dirichlet prior
-cpu_workers = 18 # number of cpu workers
-D = 2 # maximum depth for grammar
-batch_per_worker = 200 # number of sentence per batch per worker
+iters = 700
+K = 15
+init_alpha = .2
+cpu_workers = 18
+D = 2
+batch_per_worker = 200
 
 ```
+
+`input_file`: path to a `ints` file
+`output_dir`: path to a directory where the output files will be written
+`dict_file`: path to a `dict` file
+`iters`: total number of iterations to run
+`K`: total number of non-terminal categories
+`init_alpha`: the symmetric Dirichlet prior parameter
+`cpu_workers`: number of processes
+`D`: maximum allowed depthf for induced grammars
+`batch_per_worker`: number of sentences per batch per worker
 
 ### Cluster
 
@@ -65,7 +75,7 @@ It is also easy to use this with a cluster. The steps are essentially the same a
 
 1. You need to set cpu_workers to 0 in your config to tell the master that it
 is a master.
-2. You need to run `python scripts/workers/py --config-path .` for each worker
+2. You need to run `python start_cluster_worker/py --config-path .` for each worker
 you want to launch. This may be achieved in a cluster by submitting an array job
 and ask for one core for each worker.
 3. That's it.
@@ -101,3 +111,11 @@ The total occurrences and the terminal only occurrences are recorded.
 ## Other helpful scripts
 Please visit the `utils` folder to view its Readme for notes on some convenience
 tools this repo supplies.
+
+## Example
+You can start an example run by doing `python dimi-trainer.py config/config.ini`
+with the repo. It runs the center-embedding synthetic dataset provided in `datasets`.
+You should see with a high probability that the run converge at around -1750
+loglikelihood with a right-branching score of 0.38. There is a chance you
+are not able to get these results on the first try, so please try a couple
+more runs.
