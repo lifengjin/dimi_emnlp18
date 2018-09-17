@@ -115,7 +115,7 @@ tools this repo supplies.
 ## Example
 You can start an example run by doing `python dimi-trainer.py config/config.ini`
 with the repo. It runs the center-embedding synthetic dataset provided in `datasets`.
-You should see with a high probability that the run converge at around -1750
-loglikelihood with a right-branching score of 0.38. There is a chance you
+You should see with a high probability that the run converge at around -1880
+loglikelihood with a right-branching score of 0.2. There is a chance you
 are not able to get these results on the first try, so please try a couple
 more runs.
