@@ -32,6 +32,9 @@ def start_local_workers_with_distributer(work_distributer, maxLen, cpu_workers, 
                                cpu_workers=cpu_workers, gpu_workers=gpu_workers, gpu=gpu,
                                batch_size=batch_size, K=K, D=D)
 
+def worker_run_proxy(worker):
+    worker.run()
+
 def start_local_workers(host=None, jobs_port=None, results_port=None, models_port=None,
                         maxLen=None, K=None, D=None, cpu_workers=None,
                         gpu_workers=0, gpu=False, batch_size=1):
@@ -54,7 +57,7 @@ def start_local_workers(host=None, jobs_port=None, results_port=None, models_por
         #     ## cuda devices 0-(gpu_workers-1)
         #     gpu_num = i % 8
         # p = Process(target=fs.run, kwargs={'gpu_num':gpu_num})
-        p = Process(target=fs.run)
+        p = Process(target=worker_run_proxy, args=(fs,))
         p.daemon = True
         processes.append(p)
         p.start()
