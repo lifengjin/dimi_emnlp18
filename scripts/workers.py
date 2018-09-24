@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-from multiprocessing import Process
+from multiprocessing import Process, get_start_method
 import os, os.path
 import signal
 import subprocess
@@ -32,7 +32,13 @@ def start_local_workers_with_distributer(work_distributer, maxLen, cpu_workers, 
                                cpu_workers=cpu_workers, gpu_workers=gpu_workers, gpu=gpu,
                                batch_size=batch_size, K=K, D=D)
 
-def worker_run_proxy(worker):
+def worker_run_proxy(worker_list, i, config_list=None):
+    worker = worker_list[i]
+    if config_list is not None:
+        config = config_list[i]
+        host, jobs_port, results_port, models_port, maxLen, K, D, tid, gpu , batch_size, level = config
+        worker = PyzmqWorker(host, jobs_port, results_port, models_port, maxLen, K=K, D=D,
+                                     tid=tid, gpu=gpu, batch_size=batch_size, level=level)
     worker.run()
 
 def start_local_workers(host=None, jobs_port=None, results_port=None, models_port=None,
@@ -40,7 +46,8 @@ def start_local_workers(host=None, jobs_port=None, results_port=None, models_por
                         gpu_workers=0, gpu=False, batch_size=1):
     logging.info("Starting %d cpu workers and %d gpu workers at host %s with jobs_port=%d, results_port=%d, models_port=%d, maxLen=%d" % (cpu_workers, gpu_workers, host, jobs_port, results_port, models_port, maxLen) )
     processes = []
-
+    workers = []
+    worker_configs = []
     for i in range(0, cpu_workers+gpu_workers):
         if i >= gpu_workers:
             gpu = False
@@ -49,15 +56,15 @@ def start_local_workers(host=None, jobs_port=None, results_port=None, models_por
         # logging.info("distributer starts with D {} and K {}".format(D, K))
         fs = PyzmqWorker(host, jobs_port, results_port, models_port, maxLen, K=K, D=D,
                                      tid=i, gpu=gpu, batch_size=batch_size, level=logging.getLogger().getEffectiveLevel())
-        # signal.signal(signal.SIGTERM, fs.handle_sigterm)
-        # signal.signal(signal.SIGINT, fs.handle_sigint)
-        # signal.signal(signal.SIGALRM, fs.handle_sigalarm)
-        # if gpu:
-        #     ## Workers 0-(gpu_workers-1) are the gpu workers -- assign them to
-        #     ## cuda devices 0-(gpu_workers-1)
-        #     gpu_num = i % 8
-        # p = Process(target=fs.run, kwargs={'gpu_num':gpu_num})
-        p = Process(target=worker_run_proxy, args=(fs,))
+        worker_configs.append((host, jobs_port, results_port, models_port, maxLen, K, D,
+                                     i, gpu, batch_size, logging.getLogger().getEffectiveLevel()))
+        workers.append(fs)
+
+    for i in range(0, cpu_workers+gpu_workers):
+        if get_start_method() == 'spawn':
+            p = Process(target=worker_run_proxy, args=(workers,i, worker_configs))
+        else:
+            p = Process(target=worker_run_proxy, args=(workers,i))
         p.daemon = True
         processes.append(p)
         p.start()

@@ -117,7 +117,7 @@ def read_params(config):
 
 if __name__ == "__main__":
     try:
-        multiprocessing.set_start_method("fork")
+        multiprocessing.set_start_method("spawn")
     except:
         ctx = multiprocessing.get_start_method()
         print(ctx)
